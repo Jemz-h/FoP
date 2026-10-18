@@ -1,0 +1,232 @@
+@{
+    ViewData["Title"] = "Populating Fields";
+}
+
+@section Styles {
+    <style>
+        /* Fill remaining viewport on large screens, allow natural scroll on small */
+        .populating-page {
+            min-height: calc(100vh - 160px); /* subtract navbar + footer approx height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .populating-body {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+        }
+
+        /* Keep the card in view (top-left) while the discussion scrolls */
+        @@media (min-width: 992px) {
+            .profile-column .card {
+                position: sticky;
+                top: 1rem;
+            }
+        }
+
+        /* Number fields: no spinner arrows (scrolling/arrow keys must not change the value) */
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .snippet-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: .5rem;
+            padding: .75rem 1rem;
+            font-size: .8rem;
+            overflow-x: auto;
+            text-align: left;
+        }
+
+        .snippet-block code {
+            color: #d4d4d4;
+            white-space: pre;
+        }
+
+        .keyword  { color: #569cd6; }
+        .type     { color: #4ec9b0; }
+        .string   { color: #ce9178; }
+        .comment  { color: #6a9955; }
+        .method   { color: #dcdcaa; }
+
+        .discussion-section {
+            text-align: left;
+            font-size: .9rem;
+        }
+
+        .discussion-section h5 {
+            font-weight: 600;
+        }
+    </style>
+}
+
+<div class="populating-page">
+    <div class="text-center mb-3">
+        <h1 class="display-6 fw-bold">Populating Fields</h1>
+        <p class="text-muted mb-0">Learn how to fill form fields with values from the controller in an ASP.NET Core MVC application.</p>
+    </div>
+
+    <div class="populating-body row g-4">
+        @* ── Left Column: Live Demo ── *@
+        <div class="col-lg-5 d-flex flex-column justify-content-start profile-column">
+            <div class="card shadow-sm" id="profileCard">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🚀 Try It Out</h5>
+                    <form method="post" asp-action="PopulatingFields" class="mt-3 text-start">
+                        <div class="form-group mb-3">
+                            <label for="name" class="form-label">Name:</label>
+                            <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Maria Santos" value="@ViewBag.Name" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="age" class="form-label">Age:</label>
+                            <input type="number" id="age" name="age" class="form-control" placeholder="e.g. 20" value="@ViewBag.Age" min="0" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="city" class="form-label">City:</label>
+                            <input type="text" id="city" name="city" class="form-control" placeholder="e.g. Quezon City" value="@ViewBag.City" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Profile</button>
+                        <a asp-action="PopulatingFields" asp-route-sample="true" data-swap class="btn btn-outline-secondary w-100 mt-2">Fill Sample Data</a>
+                    </form>
+
+                    @if (ViewBag.Submitted != null)
+                    {
+                        <div class="alert alert-success mt-3 mb-0 text-start">
+                            <strong>Profile saved!</strong>
+                            <dl class="row mb-0 mt-2">
+                                <dt class="col-4">Name</dt>
+                                <dd class="col-8 mb-1">@ViewBag.Name</dd>
+                                <dt class="col-4">Age</dt>
+                                <dd class="col-8 mb-1">@ViewBag.Age</dd>
+                                <dt class="col-4">City</dt>
+                                <dd class="col-8 mb-0">@ViewBag.City</dd>
+                            </dl>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* ── Right Column: Discussion & Snippet ── *@
+        <div class="col-lg-7 discussion-section">
+            <h5>📖 How It Works</h5>
+            <p>
+                A form field can be <em>populated</em> by setting its <code>value</code> attribute from
+                data the controller provides. Click <strong>Fill Sample Data</strong> and the
+                <code>GET</code> action stores sample values in <code>ViewBag</code>; the view then
+                writes them into each input.
+            </p>
+            <p class="mb-0">
+                When you submit, the <code>POST</code> action receives the values by parameter name
+                and sends them back, so the fields stay filled in and the saved profile is displayed.
+                Razor automatically HTML-encodes the output to keep it safe. The form is sent with
+                <code>fetch</code> and only the card is refreshed, so the page never jumps back to the top.
+            </p>
+
+            <h5 class="mt-3">🧩 Code Snippet</h5>
+            <div class="snippet-block">
+<code><span class="comment">// Controller (HomeController.cs)</span>
+[<span class="type">HttpGet</span>]
+<span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">PopulatingFields</span>(<span class="keyword">bool</span> sample = <span class="keyword">false</span>)
+{
+    <span class="keyword">if</span> (sample)
+    {
+        <span class="type">ViewBag</span>.Name = <span class="string">"Maria Santos"</span>;
+        <span class="type">ViewBag</span>.Age  = 20;
+        <span class="type">ViewBag</span>.City = <span class="string">"Quezon City"</span>;
+    }
+    <span class="keyword">return</span> <span class="method">View</span>();
+}
+
+[<span class="type">HttpPost</span>]
+<span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">PopulatingFields</span>(<span class="keyword">string</span> name, <span class="keyword">int</span> age, <span class="keyword">string</span> city)
+{
+    <span class="type">ViewBag</span>.Name      = name;
+    <span class="type">ViewBag</span>.Age       = age;
+    <span class="type">ViewBag</span>.City      = city;
+    <span class="type">ViewBag</span>.Submitted = <span class="keyword">true</span>;
+    <span class="keyword">return</span> <span class="method">View</span>();
+}</code>
+            </div>
+
+            <div class="snippet-block mt-2">
+<code><span class="comment">&lt;!-- View (PopulatingFields.cshtml) --&gt;</span>
+&lt;<span class="keyword">form</span> <span class="type">method</span>=<span class="string">"post"</span> <span class="type">asp-action</span>=<span class="string">"PopulatingFields"</span>&gt;
+    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"text"</span>   <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"@@ViewBag.Name"</span> /&gt;
+    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"number"</span> <span class="type">name</span>=<span class="string">"age"</span>  <span class="type">value</span>=<span class="string">"@@ViewBag.Age"</span> /&gt;
+    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"text"</span>   <span class="type">name</span>=<span class="string">"city"</span> <span class="type">value</span>=<span class="string">"@@ViewBag.City"</span> /&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span>&gt;Save Profile&lt;/<span class="keyword">button</span>&gt;
+&lt;/<span class="keyword">form</span>&gt;
+
+<span class="comment">@@</span><span class="keyword">if</span> (ViewBag.Submitted != <span class="keyword">null</span>)
+{
+    &lt;<span class="keyword">p</span>&gt;<span class="comment">@@</span>ViewBag.Name, <span class="comment">@@</span>ViewBag.Age, <span class="comment">@@</span>ViewBag.City&lt;/<span class="keyword">p</span>&gt;
+}</code>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const card = document.getElementById('profileCard');
+
+            // Loads a page in the background and swaps in only the refreshed card
+            async function load(url, options) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+
+                    const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+                    const fresh = doc.getElementById('profileCard');
+                    if (!fresh) throw new Error('Card not found in response');
+
+                    card.innerHTML = fresh.innerHTML;
+                    return true;
+                } catch (e) {
+                    console.error(e);
+                    return false;
+                }
+            }
+
+            // Save Profile: post the form without reloading the page
+            card.addEventListener('submit', async function (e) {
+                const form = e.target;
+                e.preventDefault();
+                if (!(await load(form.action, { method: 'POST', body: new FormData(form) }))) {
+                    form.submit();   // fall back to a normal page post
+                }
+            });
+
+            // Fill Sample Data: same idea with a GET request
+            card.addEventListener('click', async function (e) {
+                const link = e.target.closest('a[data-swap]');
+                if (!link) return;
+                e.preventDefault();
+                if (!(await load(link.href))) {
+                    window.location.href = link.href;   // fall back to normal navigation
+                }
+            });
+
+            // Number fields must not change value with the mouse wheel or the arrow keys
+            card.addEventListener('wheel', function (e) {
+                if (e.target.matches('input[type="number"]')) e.target.blur();
+            });
+            card.addEventListener('keydown', function (e) {
+                if (e.target.matches('input[type="number"]') && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                    e.preventDefault();
+                }
+            });
+        })();
+    </script>
+}
