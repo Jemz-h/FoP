@@ -25,6 +25,48 @@
             }
         }
 
+        /* ── Lightning McQueen: drives across the screen from left to right ── */
+        .mcqueen {
+            position: fixed;
+            left: 0;
+            bottom: 20vh;
+            height: 400px;
+            width: auto;
+            z-index: 2000;
+            pointer-events: none;
+            animation: mcqueen-drive 1.6s ease-in forwards;
+        }
+
+        @@keyframes mcqueen-drive {
+            from { transform: translateX(-120%); }
+            to   { transform: translateX(100vw); }
+        }
+
+        /* ── Rickroll: centered pop-up over a dimmed page ── */
+        .rickroll-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .75);
+            cursor: pointer;
+        }
+
+        .rickroll-overlay img {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: .5rem;
+            box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .5);
+        }
+
+        .rickroll-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
         .snippet-block {
             background: #1e1e1e;
             color: #d4d4d4;
@@ -74,7 +116,21 @@
                         <button type="submit" name="name" value="Maria" class="btn btn-primary w-100">Maria</button>
                         <button type="submit" name="name" value="Juan" class="btn btn-primary w-100 mt-2">Juan</button>
                         <button type="submit" name="name" value="Ana" class="btn btn-primary w-100 mt-2">Ana</button>
+                        <button type="submit" name="name" value="Rick" class="btn btn-primary w-100 mt-2">Rick</button>
+                        <button type="submit" name="name" value="Lightning" class="btn btn-primary w-100 mt-2">Lightning</button>
                     </form>
+
+                    @if (ViewBag.Kachow != null)
+                    {
+                        @* Marker read by the script below to play the McQueen animation *@
+                        <span data-kachow data-src="@Url.Content("~/src/kachow.png")" hidden></span>
+                    }
+
+                    @if (ViewBag.Rickroll != null)
+                    {
+                        @* Marker read by the script below to show the rickroll *@
+                        <span data-rickroll data-src="@Url.Content("~/src/rick.gif")" hidden></span>
+                    }
 
                     @if (ViewBag.Message != null)
                     {
@@ -97,8 +153,10 @@
             </p>
             <p class="mb-0">
                 Each branch sets a message and a Bootstrap color name. The view puts that color into the
-                alert's class (<code>alert-success</code>, <code>alert-primary</code>, <code>alert-warning</code>),
-                so the container changes color depending on which condition was met. The form is sent with
+                alert's class (<code>alert-success</code>, <code>alert-primary</code>, <code>alert-warning</code>,
+                <code>alert-danger</code>, <code>alert-dark</code>), so the container changes color depending on which condition was met.
+                The <strong>Rick</strong> and <strong>Lightning</strong> branches also flag the view to show a rickroll
+                or to send Lightning McQueen across the screen. The form is sent with
                 <code>fetch</code> and only the card is refreshed, so the page never jumps back to the top.
             </p>
 
@@ -126,6 +184,18 @@
         message = <span class="string">"Hi Ana! Please review your details."</span>;
         color   = <span class="string">"warning"</span>;
     }
+    <span class="keyword">else if</span> (name == <span class="string">"Rick"</span>)
+    {
+        message = <span class="string">"You just got Rickrolled!"</span>;
+        color   = <span class="string">"dark"</span>;
+        <span class="type">ViewBag</span>.Rickroll = <span class="keyword">true</span>;
+    }
+    <span class="keyword">else if</span> (name == <span class="string">"Lightning"</span>)
+    {
+        message = <span class="string">"Ka-chow! Lightning McQueen is speeding by."</span>;
+        color   = <span class="string">"danger"</span>;
+        <span class="type">ViewBag</span>.Kachow = <span class="keyword">true</span>;
+    }
     <span class="keyword">else</span>
     {
         message = <span class="string">"Unknown name. Please pick one of the buttons."</span>;
@@ -145,6 +215,8 @@
     &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Maria"</span>&gt;Maria&lt;/<span class="keyword">button</span>&gt;
     &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Juan"</span>&gt;Juan&lt;/<span class="keyword">button</span>&gt;
     &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Ana"</span>&gt;Ana&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Rick"</span>&gt;Rick&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Lightning"</span>&gt;Lightning&lt;/<span class="keyword">button</span>&gt;
 &lt;/<span class="keyword">form</span>&gt;
 
 <span class="comment">@@</span><span class="keyword">if</span> (ViewBag.Message != <span class="keyword">null</span>)
@@ -160,6 +232,46 @@
     <script>
         (function () {
             const card = document.getElementById('conditionalCard');
+
+            // Lightning: send McQueen across the screen when the card carries the marker
+            function playKachow() {
+                const marker = card.querySelector('[data-kachow]');
+                if (!marker) return;
+
+                const car = document.createElement('img');
+                car.src = marker.dataset.src;
+                car.alt = '';
+                car.className = 'mcqueen';
+                car.addEventListener('animationend', function () { car.remove(); });
+                document.body.appendChild(car);
+            }
+
+            // Rick: show the gif over a dimmed page until it is clicked or closed
+            function playRickroll() {
+                const marker = card.querySelector('[data-rickroll]');
+                if (!marker) return;
+
+                const overlay = document.createElement('div');
+                overlay.className = 'rickroll-overlay';
+                overlay.innerHTML =
+                    '<button type="button" class="btn btn-light rickroll-close">Close ✕</button>' +
+                    '<img alt="Rickroll" />';
+                overlay.querySelector('img').src = marker.dataset.src;
+
+                function close() {
+                    overlay.remove();
+                    document.removeEventListener('keydown', onKey);
+                }
+                function onKey(e) { if (e.key === 'Escape') close(); }
+
+                overlay.addEventListener('click', close);
+                document.addEventListener('keydown', onKey);
+                document.body.appendChild(overlay);
+            }
+
+            // Play whatever the card asks for (also covers the normal page post fallback)
+            playKachow();
+            playRickroll();
 
             // Click a name: post the form in the background and swap in only the refreshed card
             card.addEventListener('submit', async function (e) {
@@ -178,6 +290,8 @@
                     if (!fresh) throw new Error('Card not found in response');
 
                     card.innerHTML = fresh.innerHTML;
+                    playKachow();
+                    playRickroll();
                 } catch (err) {
                     console.error(err);
 

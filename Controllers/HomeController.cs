@@ -129,6 +129,18 @@ namespace Prog_Fun.Controllers
                 message = "Hi Ana! Please review your details.";
                 color   = "warning";
             }
+            else if (name == "Rick")
+            {
+                message = "You just got Rickrolled!";
+                color   = "dark";
+                ViewBag.Rickroll = true;   // tells the view to show the rickroll
+            }
+            else if (name == "Lightning")
+            {
+                message = "Ka-chow! Lightning McQueen is speeding by.";
+                color   = "danger";
+                ViewBag.Kachow = true;   // tells the view to play the McQueen animation
+            }
             else
             {
                 message = "Unknown name. Please pick one of the buttons.";
