@@ -7,11 +7,6 @@ namespace Prog_Fun.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         public IActionResult Privacy()
         {
             return View();
@@ -103,6 +98,113 @@ namespace Prog_Fun.Controllers
             ViewBag.Age       = age;
             ViewBag.City      = city;
             ViewBag.Submitted = true;
+            return View();
+        }
+
+        // ── Conditional Statement ──
+        [HttpGet]
+        public IActionResult ConditionalStatement()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ConditionalStatement(string name)
+        {
+            string message;
+            string color;   // Bootstrap color name used by the alert container
+
+            if (name == "Maria")
+            {
+                message = "Welcome back, Maria! Everything is in order.";
+                color   = "success";
+            }
+            else if (name == "Juan")
+            {
+                message = "Hello Juan! Here is some information for you.";
+                color   = "primary";
+            }
+            else if (name == "Ana")
+            {
+                message = "Hi Ana! Please review your details.";
+                color   = "warning";
+            }
+            else
+            {
+                message = "Unknown name. Please pick one of the buttons.";
+                color   = "secondary";
+            }
+
+            ViewBag.Name    = name;
+            ViewBag.Message = message;
+            ViewBag.Color   = color;
+            return View();
+        }
+
+        // ── Array ──
+        // The array is sent back and forth with each request (hidden fields), so the
+        // controller rebuilds it every time. Arrays have a fixed size, so adding or
+        // removing a value creates a new array.
+        [HttpGet]
+        public IActionResult Array()
+        {
+            ViewBag.Items = new string[] { "Apple", "Banana", "Cherry" };
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Array(string[] items, string command, string addValue, int? removeIndex, int? printIndex)
+        {
+            items ??= new string[0];
+
+            if (command == "add")
+            {
+                if (string.IsNullOrWhiteSpace(addValue))
+                {
+                    ViewBag.Message = "Please type a value to add.";
+                    ViewBag.Color   = "warning";
+                }
+                else
+                {
+                    items = items.Append(addValue.Trim()).ToArray();
+                    ViewBag.Message = $"Added \"{addValue.Trim()}\" at index {items.Length - 1}.";
+                    ViewBag.Color   = "success";
+                }
+            }
+            else if (command == "remove")
+            {
+                if (removeIndex == null || removeIndex < 0 || removeIndex >= items.Length)
+                {
+                    ViewBag.Message = items.Length == 0
+                        ? "The array is empty. Nothing to remove."
+                        : $"Enter an index from 0 to {items.Length - 1}.";
+                    ViewBag.Color = "warning";
+                }
+                else
+                {
+                    var removed = items[removeIndex.Value];
+                    items = items.Where((_, i) => i != removeIndex).ToArray();
+                    ViewBag.Message = $"Removed \"{removed}\" from index {removeIndex}.";
+                    ViewBag.Color   = "danger";
+                }
+            }
+            else if (command == "print")
+            {
+                if (printIndex == null || printIndex < 0 || printIndex >= items.Length)
+                {
+                    ViewBag.Message = items.Length == 0
+                        ? "The array is empty. Nothing to print."
+                        : $"Enter an index from 0 to {items.Length - 1}.";
+                    ViewBag.Color = "warning";
+                }
+                else
+                {
+                    ViewBag.Message = $"items[{printIndex}] = \"{items[printIndex.Value]}\"";
+                    ViewBag.Color   = "info";
+                }
+            }
+
+            ViewBag.Items = items;
             return View();
         }
 

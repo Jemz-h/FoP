@@ -1,0 +1,197 @@
+@{
+    ViewData["Title"] = "Conditional Statement";
+}
+
+@section Styles {
+    <style>
+        /* Fill remaining viewport on large screens, allow natural scroll on small */
+        .conditional-page {
+            min-height: calc(100vh - 160px); /* subtract navbar + footer approx height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conditional-body {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+        }
+
+        /* Keep the card in view (top-left) while the discussion scrolls */
+        @@media (min-width: 992px) {
+            .conditional-column .card {
+                position: sticky;
+                top: 1rem;
+            }
+        }
+
+        .snippet-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: .5rem;
+            padding: .75rem 1rem;
+            font-size: .8rem;
+            overflow-x: auto;
+            text-align: left;
+        }
+
+        .snippet-block code {
+            color: #d4d4d4;
+            white-space: pre;
+        }
+
+        .keyword  { color: #569cd6; }
+        .type     { color: #4ec9b0; }
+        .string   { color: #ce9178; }
+        .comment  { color: #6a9955; }
+        .method   { color: #dcdcaa; }
+
+        .discussion-section {
+            text-align: left;
+            font-size: .9rem;
+        }
+
+        .discussion-section h5 {
+            font-weight: 600;
+        }
+    </style>
+}
+
+<div class="conditional-page">
+    <div class="text-center mb-3">
+        <h1 class="display-6 fw-bold">Conditional Statement</h1>
+        <p class="text-muted mb-0">Learn how an if / else if / else statement picks a different result in an ASP.NET Core MVC application.</p>
+    </div>
+
+    <div class="conditional-body row g-4">
+        @* ── Left Column: Live Demo ── *@
+        <div class="col-lg-5 d-flex flex-column justify-content-start conditional-column">
+            <div class="card shadow-sm" id="conditionalCard">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🚀 Try It Out</h5>
+                    <form method="post" asp-action="ConditionalStatement" class="mt-3">
+                        <p class="form-label">Click a name:</p>
+                        <button type="submit" name="name" value="Maria" class="btn btn-primary w-100">Maria</button>
+                        <button type="submit" name="name" value="Juan" class="btn btn-primary w-100 mt-2">Juan</button>
+                        <button type="submit" name="name" value="Ana" class="btn btn-primary w-100 mt-2">Ana</button>
+                    </form>
+
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-@ViewBag.Color mt-3 mb-0 text-start">
+                            <strong>Selected name:</strong> @ViewBag.Name
+                            <div class="mt-1">@ViewBag.Message</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* ── Right Column: Discussion & Snippet ── *@
+        <div class="col-lg-7 discussion-section">
+            <h5>📖 How It Works</h5>
+            <p>
+                A <em>conditional statement</em> lets a program choose between different paths. The controller
+                checks the name sent by the button you clicked using <code>if</code>, <code>else if</code> and
+                <code>else</code>. The first condition that is true runs, and the rest are skipped.
+            </p>
+            <p class="mb-0">
+                Each branch sets a message and a Bootstrap color name. The view puts that color into the
+                alert's class (<code>alert-success</code>, <code>alert-primary</code>, <code>alert-warning</code>),
+                so the container changes color depending on which condition was met. The form is sent with
+                <code>fetch</code> and only the card is refreshed, so the page never jumps back to the top.
+            </p>
+
+            <h5 class="mt-3">🧩 Code Snippet</h5>
+            <div class="snippet-block">
+<code><span class="comment">// Controller (HomeController.cs)</span>
+[<span class="type">HttpPost</span>]
+<span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">ConditionalStatement</span>(<span class="keyword">string</span> name)
+{
+    <span class="keyword">string</span> message;
+    <span class="keyword">string</span> color;
+
+    <span class="keyword">if</span> (name == <span class="string">"Maria"</span>)
+    {
+        message = <span class="string">"Welcome back, Maria! Everything is in order."</span>;
+        color   = <span class="string">"success"</span>;
+    }
+    <span class="keyword">else if</span> (name == <span class="string">"Juan"</span>)
+    {
+        message = <span class="string">"Hello Juan! Here is some information for you."</span>;
+        color   = <span class="string">"primary"</span>;
+    }
+    <span class="keyword">else if</span> (name == <span class="string">"Ana"</span>)
+    {
+        message = <span class="string">"Hi Ana! Please review your details."</span>;
+        color   = <span class="string">"warning"</span>;
+    }
+    <span class="keyword">else</span>
+    {
+        message = <span class="string">"Unknown name. Please pick one of the buttons."</span>;
+        color   = <span class="string">"secondary"</span>;
+    }
+
+    <span class="type">ViewBag</span>.Name    = name;
+    <span class="type">ViewBag</span>.Message = message;
+    <span class="type">ViewBag</span>.Color   = color;
+    <span class="keyword">return</span> <span class="method">View</span>();
+}</code>
+            </div>
+
+            <div class="snippet-block mt-2">
+<code><span class="comment">&lt;!-- View (ConditionalStatement.cshtml) --&gt;</span>
+&lt;<span class="keyword">form</span> <span class="type">method</span>=<span class="string">"post"</span> <span class="type">asp-action</span>=<span class="string">"ConditionalStatement"</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Maria"</span>&gt;Maria&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Juan"</span>&gt;Juan&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Ana"</span>&gt;Ana&lt;/<span class="keyword">button</span>&gt;
+&lt;/<span class="keyword">form</span>&gt;
+
+<span class="comment">@@</span><span class="keyword">if</span> (ViewBag.Message != <span class="keyword">null</span>)
+{
+    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"alert alert-@@ViewBag.Color"</span>&gt;<span class="comment">@@</span>ViewBag.Message&lt;/<span class="keyword">div</span>&gt;
+}</code>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const card = document.getElementById('conditionalCard');
+
+            // Click a name: post the form in the background and swap in only the refreshed card
+            card.addEventListener('submit', async function (e) {
+                const form = e.target;
+                e.preventDefault();
+
+                // Include the clicked button's name/value in the posted data
+                const data = new FormData(form, e.submitter);
+
+                try {
+                    const response = await fetch(form.action, { method: 'POST', body: data });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+
+                    const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+                    const fresh = doc.getElementById('conditionalCard');
+                    if (!fresh) throw new Error('Card not found in response');
+
+                    card.innerHTML = fresh.innerHTML;
+                } catch (err) {
+                    console.error(err);
+
+                    // Fall back to a normal page post, keeping the clicked name
+                    if (e.submitter) {
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = e.submitter.name;
+                        hidden.value = e.submitter.value;
+                        form.appendChild(hidden);
+                    }
+                    form.submit();
+                }
+            });
+        })();
+    </script>
+}
