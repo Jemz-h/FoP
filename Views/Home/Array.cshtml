@@ -3,236 +3,129 @@
     var items = (string[])(ViewBag.Items ?? new string[0]);
 }
 
-@section Styles {
-    <style>
-        /* Fill remaining viewport on large screens, allow natural scroll on small */
-        .array-page {
-            min-height: calc(100vh - 160px); /* subtract navbar + footer approx height */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .array-body {
-            flex: 1;
-            display: flex;
-            align-items: stretch;
-        }
-
-        /* Keep the card in view (top-left) while the discussion scrolls */
-        @@media (min-width: 992px) {
-            .array-column .card {
-                position: sticky;
-                top: 1rem;
-            }
-        }
-
-        /* Number fields: no spinner arrows (scrolling/arrow keys must not change the value) */
-        input[type="number"] {
-            -moz-appearance: textfield;
-            appearance: textfield;
-        }
-
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        /* ── Array display ── */
-        .array-display {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border-radius: .5rem;
-            padding: .75rem 1rem;
-            text-align: left;
-            font-family: Consolas, "Courier New", monospace;
-        }
-
-        .array-length {
-            font-size: .85rem;
-            color: #808080;
-        }
-
-        .array-cells {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .5rem;
-            margin-top: .5rem;
-        }
-
-        .array-cell {
-            border: 1px solid #569cd6;
-            border-radius: .35rem;
-            padding: .25rem .75rem;
-            text-align: center;
-            min-width: 4.5rem;
-        }
-
-        .array-cell .cell-index {
-            display: block;
-            font-size: .7rem;
-            color: #808080;
-        }
-
-        .array-cell .cell-value {
-            color: #ce9178;
-            font-weight: 600;
-        }
-
-        .array-empty {
-            color: #808080;
-        }
-
-        .snippet-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border-radius: .5rem;
-            padding: .75rem 1rem;
-            font-size: .8rem;
-            overflow-x: auto;
-            text-align: left;
-        }
-
-        .snippet-block code {
-            color: #d4d4d4;
-            white-space: pre;
-        }
-
-        .keyword  { color: #569cd6; }
-        .type     { color: #4ec9b0; }
-        .string   { color: #ce9178; }
-        .comment  { color: #6a9955; }
-        .method   { color: #dcdcaa; }
-
-        .discussion-section {
-            text-align: left;
-            font-size: .9rem;
-        }
-
-        .discussion-section h5 {
-            font-weight: 600;
-        }
-    </style>
-}
-
-<div class="array-page">
-    <div class="text-center mb-3">
-        <h1 class="display-6 fw-bold">Array</h1>
-        <p class="text-muted mb-0">Learn how to store, add, remove and print values in an array in an ASP.NET Core MVC application.</p>
+<div class="yt-page-header">
+    <div class="yt-page-title-group">
+        <h1>Array Operations</h1>
+        <p class="yt-page-desc">Learn how to manipulate fixed-length arrays (Store, Add, Remove, and Index) in ASP.NET Core MVC.</p>
     </div>
+</div>
 
-    <div class="array-body row g-4">
-        @* ── Left Column: Live Demo ── *@
-        <div class="col-lg-5 d-flex flex-column justify-content-start array-column">
-            <div class="card shadow-sm" id="arrayCard">
-                <div class="card-body text-center">
-                    <h5 class="card-title">🚀 Try It Out</h5>
+<div class="row g-4 align-items-start">
+    @* ── Left Column: Live Card ── *@
+    <div class="col-lg-5">
+        <div class="yt-card" id="arrayCard">
+            <div class="yt-card-header">
+                <h5 class="yt-card-title">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#FF0000">
+                        <polygon points="6,3 18,12 6,21" />
+                    </svg>
+                    Array Visualizer
+                </h5>
+            </div>
 
-                    @* The array itself *@
-                    <div class="array-display mt-3">
-                        <div class="array-length">items.Length = @items.Length</div>
-                        @if (items.Length == 0)
+            @* The array display *@
+            <div class="array-display">
+                <div class="array-length">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M4 10h16v2H4zm0-4h16v2H4zm0 8h16v2H4zm0 4h16v2H4z"/>
+                    </svg>
+                    <span>Length: <strong>@items.Length</strong> elements</span>
+                </div>
+                @if (items.Length == 0)
+                {
+                    <div class="array-empty mt-2">(empty array)</div>
+                }
+                else
+                {
+                    <div class="array-cells">
+                        @for (int i = 0; i < items.Length; i++)
                         {
-                            <div class="array-empty mt-2">(empty array)</div>
-                        }
-                        else
-                        {
-                            <div class="array-cells">
-                                @for (int i = 0; i < items.Length; i++)
-                                {
-                                    <div class="array-cell">
-                                        <span class="cell-index">[@i]</span>
-                                        <span class="cell-value">@items[i]</span>
-                                    </div>
-                                }
+                            <div class="array-cell">
+                                <span class="cell-index">[@i]</span>
+                                <span class="cell-value">@items[i]</span>
                             </div>
                         }
                     </div>
-
-                    <form method="post" asp-action="Array" class="mt-3 text-start">
-                        @* Send the current array back with every request *@
-                        @foreach (var item in items)
-                        {
-                            <input type="hidden" name="items" value="@item" />
-                        }
-
-                        <div class="form-group mb-3">
-                            <label for="addValue" class="form-label">Add a value:</label>
-                            <div class="input-group">
-                                <input type="text" id="addValue" name="addValue" class="form-control" placeholder="e.g. Mango" />
-                                <button type="submit" name="command" value="add" class="btn btn-primary">Add</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="removeIndex" class="form-label">Remove the value at index:</label>
-                            <div class="input-group">
-                                <input type="number" id="removeIndex" name="removeIndex" class="form-control" placeholder="e.g. 1" min="0" />
-                                <button type="submit" name="command" value="remove" class="btn btn-primary">Remove</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-0">
-                            <label for="printIndex" class="form-label">Print the value at index:</label>
-                            <div class="input-group">
-                                <input type="number" id="printIndex" name="printIndex" class="form-control" placeholder="e.g. 0" min="0" />
-                                <button type="submit" name="command" value="print" class="btn btn-primary">Print</button>
-                            </div>
-                        </div>
-                    </form>
-
-                    @if (ViewBag.Message != null)
-                    {
-                        <div class="alert alert-@ViewBag.Color mt-3 mb-0 text-start">
-                            @ViewBag.Message
-                        </div>
-                    }
-                </div>
+                }
             </div>
+
+            <form method="post" asp-action="Array" class="mt-4 text-start">
+                @foreach (var item in items)
+                {
+                    <input type="hidden" name="items" value="@item" />
+                }
+
+                <div class="mb-3">
+                    <label for="addValue" class="form-label">Add value:</label>
+                    <div class="input-group">
+                        <input type="text" id="addValue" name="addValue" class="form-control" placeholder="e.g. Mango" />
+                        <button type="submit" name="command" value="add" class="btn btn-primary">
+                            Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="removeIndex" class="form-label">Remove value at index:</label>
+                    <div class="input-group">
+                        <input type="number" id="removeIndex" name="removeIndex" class="form-control" placeholder="e.g. 1" min="0" />
+                        <button type="submit" name="command" value="remove" class="btn btn-danger">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-0">
+                    <label for="printIndex" class="form-label">Print value at index:</label>
+                    <div class="input-group">
+                        <input type="number" id="printIndex" name="printIndex" class="form-control" placeholder="e.g. 0" min="0" />
+                        <button type="submit" name="command" value="print" class="btn btn-outline-secondary">
+                           Inspect
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-@ViewBag.Color mt-4 mb-0 text-start">
+                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px;">
+                        Array Operation Result
+                    </div>
+                    <div class="fw-bold text-white">@ViewBag.Message</div>
+                </div>
+            }
         </div>
+    </div>
 
-        @* ── Right Column: Discussion & Snippet ── *@
-        <div class="col-lg-7 discussion-section">
-            <h5>📖 How It Works</h5>
+    @* ── Right Column: YouTube Description & Code Panel ── *@
+    <div class="col-lg-7">
+        <div class="yt-description-box">
+
+            <h5 class="fw-bold mb-2 text-white">📖 How It Works</h5>
             <p>
-                An <em>array</em> stores several values of the same type under one name. Each value has an
-                <em>index</em> that starts at <code>0</code>, so the first value is <code>items[0]</code>.
-                The array starts with three values (<code>Apple</code>, <code>Banana</code>, <code>Cherry</code>)
-                and its current contents are always shown in the card.
+                An <em>array</em> is a contiguous collection of elements identified by zero-based indexes.
+                Because native C# arrays possess a fixed capacity, adding or removing items internally initializes
+                a new array with the updated size.
             </p>
             <p>
-                An array has a fixed size, so <strong>Add</strong> and <strong>Remove</strong> build a new array
-                with one more or one fewer value. <strong>Print</strong> simply reads <code>items[index]</code>.
-                Because each request starts fresh, the card sends the array back in hidden fields and the
-                controller rebuilds it every time.
-            </p>
-            <p class="mb-0">
-                The form is sent with <code>fetch</code> and only the card is refreshed, so the page never
-                jumps back to the top. Reloading the page puts the three starting values back.
+                In a stateless HTTP environment, the current elements are sent across requests via hidden input fields,
+                allowing the controller to reconstruct the state on each command.
             </p>
 
-            <h5 class="mt-3">🧩 Code Snippet</h5>
+            <h5 class="fw-bold mt-4 mb-2 text-white">🧩 Code Snippet</h5>
             <div class="snippet-block">
 <code><span class="comment">// Controller (HomeController.cs)</span>
-[<span class="type">HttpGet</span>]
-<span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">Array</span>()
-{
-    <span class="type">ViewBag</span>.Items = <span class="keyword">new</span> <span class="keyword">string</span>[] { <span class="string">"Apple"</span>, <span class="string">"Banana"</span>, <span class="string">"Cherry"</span> };
-    <span class="keyword">return</span> <span class="method">View</span>();
-}
-
 [<span class="type">HttpPost</span>]
 <span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">Array</span>(<span class="keyword">string</span>[] items, <span class="keyword">string</span> command,
                              <span class="keyword">string</span> addValue, <span class="keyword">int</span>? removeIndex, <span class="keyword">int</span>? printIndex)
 {
     <span class="keyword">if</span> (command == <span class="string">"add"</span>)
     {
-        <span class="comment">// a new array, one value longer</span>
         items = items.<span class="method">Append</span>(addValue).<span class="method">ToArray</span>();
     }
     <span class="keyword">else if</span> (command == <span class="string">"remove"</span>)
     {
-        <span class="comment">// a new array without the value at removeIndex</span>
         items = items.<span class="method">Where</span>((_, i) =&gt; i != removeIndex).<span class="method">ToArray</span>();
     }
     <span class="keyword">else if</span> (command == <span class="string">"print"</span>)
@@ -245,21 +138,15 @@
 }</code>
             </div>
 
-            <div class="snippet-block mt-2">
+            <div class="snippet-block mt-3">
 <code><span class="comment">&lt;!-- View (Array.cshtml) --&gt;</span>
 <span class="comment">@@</span><span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; items.Length; i++)
 {
-    &lt;<span class="keyword">span</span>&gt;[<span class="comment">@@</span>i] <span class="comment">@@</span>items[i]&lt;/<span class="keyword">span</span>&gt;
-}
-
-&lt;<span class="keyword">form</span> <span class="type">method</span>=<span class="string">"post"</span> <span class="type">asp-action</span>=<span class="string">"Array"</span>&gt;
-    <span class="comment">@@</span><span class="keyword">foreach</span> (<span class="keyword">var</span> item <span class="keyword">in</span> items)
-    {
-        &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"hidden"</span> <span class="type">name</span>=<span class="string">"items"</span> <span class="type">value</span>=<span class="string">"@@item"</span> /&gt;
-    }
-    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"text"</span> <span class="type">name</span>=<span class="string">"addValue"</span> /&gt;
-    &lt;<span class="keyword">button</span> <span class="type">name</span>=<span class="string">"command"</span> <span class="type">value</span>=<span class="string">"add"</span>&gt;Add&lt;/<span class="keyword">button</span>&gt;
-&lt;/<span class="keyword">form</span>&gt;</code>
+    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"array-cell"</span>&gt;
+        &lt;<span class="keyword">span</span>&gt;[<span class="comment">@@</span>i]&lt;/<span class="keyword">span</span>&gt;
+        &lt;<span class="keyword">span</span>&gt;<span class="comment">@@</span>items[i]&lt;/<span class="keyword">span</span>&gt;
+    &lt;/<span class="keyword">div</span>&gt;
+}</code>
             </div>
         </div>
     </div>
@@ -270,12 +157,11 @@
         (function () {
             const card = document.getElementById('arrayCard');
 
-            // Add / Remove / Print: post the form without reloading the page
+            // Add / Remove / Print: post without reloading
             card.addEventListener('submit', async function (e) {
                 const form = e.target;
                 e.preventDefault();
 
-                // Include the clicked button's name/value (the command) in the posted data
                 const data = new FormData(form, e.submitter);
 
                 try {
@@ -290,7 +176,6 @@
                 } catch (err) {
                     console.error(err);
 
-                    // Fall back to a normal page post, keeping the clicked command
                     if (e.submitter) {
                         const hidden = document.createElement('input');
                         hidden.type = 'hidden';
@@ -302,7 +187,7 @@
                 }
             });
 
-            // Number fields must not change value with the mouse wheel or the arrow keys
+            // Prevent wheel and arrow accidental increments
             card.addEventListener('wheel', function (e) {
                 if (e.target.matches('input[type="number"]')) e.target.blur();
             });

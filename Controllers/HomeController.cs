@@ -63,15 +63,33 @@ namespace Prog_Fun.Controllers
             var symbol = op switch { "*" => "×", "/" => "÷", "-" => "−", _ => op };
             var expression = $"{Format(num1)} {symbol} {Format(num2)}";
 
+            ViewBag.Num1 = num1;
+            ViewBag.Num2 = num2;
+            ViewBag.Op = op;
+            ViewBag.Expression = expression;
+
             if (result == null)
             {
                 var error = (op == "/" || op == "%") && num2 == 0
                     ? "Cannot divide by zero."
                     : "Unknown operator.";
-                return Json(new { expression, error });
+                ViewBag.Error = error;
+
+                if (Request.Headers.Accept.ToString().Contains("application/json"))
+                {
+                    return Json(new { expression, error });
+                }
+                return View();
             }
 
-            return Json(new { expression, answer = Format(result.Value) });
+            ViewBag.Answer = Format(result.Value);
+
+            if (Request.Headers.Accept.ToString().Contains("application/json"))
+            {
+                return Json(new { expression, answer = Format(result.Value) });
+            }
+
+            return View();
         }
 
         // Rounds away tiny floating-point noise (0.1 + 0.2)
@@ -128,18 +146,6 @@ namespace Prog_Fun.Controllers
             {
                 message = "Hi Ana! Please review your details.";
                 color   = "warning";
-            }
-            else if (name == "Rick")
-            {
-                message = "You just got Rickrolled!";
-                color   = "dark";
-                ViewBag.Rickroll = true;   // tells the view to show the rickroll
-            }
-            else if (name == "Lightning")
-            {
-                message = "Ka-chow! Lightning McQueen is speeding by.";
-                color   = "danger";
-                ViewBag.Kachow = true;   // tells the view to play the McQueen animation
             }
             else
             {

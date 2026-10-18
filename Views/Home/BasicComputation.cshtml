@@ -1,202 +1,112 @@
 @{
     ViewData["Title"] = "Basic Computation";
+    var currentOp = ViewBag.Op as string ?? "+";
 }
 
-@section Styles {
-    <style>
-        /* Fill remaining viewport on large screens, allow natural scroll on small */
-        .computation-page {
-            min-height: calc(100vh - 160px); /* subtract navbar + footer approx height */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .computation-body {
-            flex: 1;
-            display: flex;
-            align-items: stretch;
-        }
-
-        /* Keep the calculator in view (top-left) while the discussion scrolls */
-        @@media (min-width: 992px) {
-            .calc-column .card {
-                position: sticky;
-                top: 1rem;
-            }
-        }
-
-        /* ── Calculator ── */
-        .calc {
-            max-width: 320px;
-            margin: 0 auto;
-        }
-
-        .calc-display {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border-radius: .5rem;
-            padding: .75rem 1rem;
-            text-align: right;
-            font-family: Consolas, "Courier New", monospace;
-        }
-
-        .calc-expression {
-            min-height: 1.25rem;
-            font-size: .85rem;
-            color: #808080;
-            white-space: nowrap;
-            overflow-x: auto;
-        }
-
-        .calc-value {
-            font-size: 2rem;
-            font-weight: 600;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow-x: auto;
-        }
-
-        .calc-value.is-error {
-            color: #f48771;
-        }
-
-        .calc-keys {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: .5rem;
-        }
-
-        .calc-btn {
-            padding: .85rem 0;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .calc-zero {
-            grid-column: span 2;
-        }
-
-        .snippet-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border-radius: .5rem;
-            padding: .75rem 1rem;
-            font-size: .8rem;
-            overflow-x: auto;
-            text-align: left;
-        }
-
-        .snippet-block code {
-            color: #d4d4d4;
-            white-space: pre;
-        }
-
-        .keyword  { color: #569cd6; }
-        .type     { color: #4ec9b0; }
-        .string   { color: #ce9178; }
-        .comment  { color: #6a9955; }
-        .method   { color: #dcdcaa; }
-
-        .discussion-section {
-            text-align: left;
-            font-size: .9rem;
-        }
-
-        .discussion-section h5 {
-            font-weight: 600;
-        }
-    </style>
-}
-
-<div class="computation-page">
-    <div class="text-center mb-3">
-        <h1 class="display-6 fw-bold">Basic Computation</h1>
-        <p class="text-muted mb-0">Learn how to build a basic calculator that sends its work to an ASP.NET Core MVC controller.</p>
+<div class="yt-page-header">
+    <div class="yt-page-title-group">
+        <h1>Basic Computation</h1>
+        <p class="yt-page-desc">Learn how to select arithmetic operations and compute results in ASP.NET Core MVC.</p>
     </div>
+</div>
 
-    <div class="computation-body row g-4">
-        @* ── Left Column: Live Demo (top-left) ── *@
-        <div class="col-lg-5 d-flex flex-column justify-content-start calc-column">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">🚀 Try It Out</h5>
+<div class="row g-4 align-items-start">
+    @* ── Left Column: Live Card ── *@
+    <div class="col-lg-5">
+        <div class="yt-card" id="calcCard">
+            <div class="yt-card-header">
+                <h5 class="yt-card-title">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#FF0000">
+                        <polygon points="6,3 18,12 6,21" />
+                    </svg>
+                    Try It Out
+                </h5>
+            </div>
 
-                    <div class="calc mt-3" id="calc">
+            <form method="post" asp-action="BasicComputation" id="calcForm">
+                <div class="mb-3">
+                    <label for="num1" class="form-label">First Number:</label>
+                    <input type="number" step="any" id="num1" name="num1" class="form-control" placeholder="e.g. 24" value="@ViewBag.Num1" required />
+                </div>
 
-                        @* Holds the anti-forgery token and the action URL; the keypad fills the hidden fields *@
-                        <form method="post" asp-action="BasicComputation" id="calcForm">
-                            <input type="hidden" name="num1" id="num1" />
-                            <input type="hidden" name="op" id="op" />
-                            <input type="hidden" name="num2" id="num2" />
-                        </form>
-
-                        <div class="calc-display mb-3" aria-live="polite">
-                            <div class="calc-expression" id="calcExpression"></div>
-                            <div class="calc-value" id="calcValue">0</div>
-                        </div>
-
-                        <div class="calc-keys">
-                            <button type="button" class="btn btn-danger calc-btn" data-key="C" aria-label="Clear">C</button>
-                            <button type="button" class="btn btn-secondary calc-btn" data-key="B" aria-label="Backspace">⌫</button>
-                            <button type="button" class="btn btn-outline-primary calc-btn" data-key="%" title="Remainder (modulo)" aria-label="Remainder">%</button>
-                            <button type="button" class="btn btn-outline-primary calc-btn" data-key="/" aria-label="Divide">÷</button>
-
-                            <button type="button" class="btn btn-light border calc-btn" data-key="7">7</button>
-                            <button type="button" class="btn btn-light border calc-btn" data-key="8">8</button>
-                            <button type="button" class="btn btn-light border calc-btn" data-key="9">9</button>
-                            <button type="button" class="btn btn-outline-primary calc-btn" data-key="*" aria-label="Multiply">×</button>
-
-                            <button type="button" class="btn btn-light border calc-btn" data-key="4">4</button>
-                            <button type="button" class="btn btn-light border calc-btn" data-key="5">5</button>
-                            <button type="button" class="btn btn-light border calc-btn" data-key="6">6</button>
-                            <button type="button" class="btn btn-outline-primary calc-btn" data-key="-" aria-label="Subtract">−</button>
-
-                            <button type="button" class="btn btn-light border calc-btn" data-key="1">1</button>
-                            <button type="button" class="btn btn-light border calc-btn" data-key="2">2</button>
-                            <button type="button" class="btn btn-light border calc-btn" data-key="3">3</button>
-                            <button type="button" class="btn btn-outline-primary calc-btn" data-key="+" aria-label="Add">+</button>
-
-                            <button type="button" class="btn btn-light border calc-btn calc-zero" data-key="0">0</button>
-                            <button type="button" class="btn btn-light border calc-btn" data-key="." aria-label="Decimal point">.</button>
-                            <button type="button" class="btn btn-primary calc-btn" data-key="=" aria-label="Equals">=</button>
-                        </div>
-                    </div>
-
-                    @* Shown by JavaScript only when a calculation fails (no page reload) *@
-                    <div class="alert alert-danger mt-3 mb-0 d-none" id="calcError">
-                        <strong>Oops:</strong> <span id="calcErrorText"></span>
+                <div class="mb-3">
+                    <label class="form-label">Operator:</label>
+                    <div class="yt-operator-pills">
+                        <label class="yt-op-pill">
+                            <input type="radio" name="op" value="+" @(currentOp == "+" ? "checked" : "") />
+                            <span>+ (Add)</span>
+                        </label>
+                        <label class="yt-op-pill">
+                            <input type="radio" name="op" value="-" @(currentOp == "-" ? "checked" : "") />
+                            <span>− (Subtract)</span>
+                        </label>
+                        <label class="yt-op-pill">
+                            <input type="radio" name="op" value="*" @(currentOp == "*" ? "checked" : "") />
+                            <span>× (Multiply)</span>
+                        </label>
+                        <label class="yt-op-pill">
+                            <input type="radio" name="op" value="/" @(currentOp == "/" ? "checked" : "") />
+                            <span>÷ (Divide)</span>
+                        </label>
+                        <label class="yt-op-pill">
+                            <input type="radio" name="op" value="%" @(currentOp == "%" ? "checked" : "") />
+                            <span>% (Modulo)</span>
+                        </label>
                     </div>
                 </div>
-            </div>
+
+                <div class="mb-3">
+                    <label for="num2" class="form-label">Second Number:</label>
+                    <input type="number" step="any" id="num2" name="num2" class="form-control" placeholder="e.g. 6" value="@ViewBag.Num2" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <span class="me-1">▶</span> Calculate
+                </button>
+            </form>
+
+            @if (ViewBag.Answer != null)
+            {
+                <div class="alert alert-success mt-4 mb-0" id="calcResultAlert">
+                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--yt-green); font-weight: 600; margin-bottom: 4px;">
+                        Calculation Result
+                    </div>
+                    <strong>Equation:</strong> @ViewBag.Expression = <span class="badge bg-success fs-6 ms-1">@ViewBag.Answer</span>
+                </div>
+            }
+            else if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-4 mb-0" id="calcErrorAlert">
+                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--yt-red); font-weight: 600; margin-bottom: 4px;">
+                        Calculation Error
+                    </div>
+                    <strong>Error:</strong> @ViewBag.Error
+                </div>
+            }
         </div>
+    </div>
 
-        @* ── Right Column: Discussion & Snippet ── *@
-        <div class="col-lg-7 discussion-section">
-            <h5>📖 How It Works</h5>
+    @* ── Right Column: Description & Code Panel ── *@
+    <div class="col-lg-7">
+        <div class="yt-description-box">
+            <div class="yt-meta-stats">
+                39,120 views &bull; Updated for .NET 9 &bull; Intermediate
+            </div>
+
+            <h5 class="fw-bold mb-2 text-white">📖 How It Works</h5>
             <p>
-                The keypad builds your calculation in the browser: the first number, the operator
-                and the second number. When you press <strong>=</strong> (or another operator),
-                those three values are sent to a controller action with <code>fetch</code>. The
-                action does the math in C# and returns the result as JSON, so the page never
-                reloads and stays exactly where you scrolled.
+                This form accepts a first operand (<code>num1</code>), an arithmetic operator (<code>op</code>),
+                and a second operand (<code>num2</code>). When submitted, ASP.NET Core MVC maps the fields
+                to the action parameters via model binding.
             </p>
             <p>
-                Like a normal calculator, pressing an operator after the second number calculates
-                the answer first and then continues with the new operator
-                (<code>2 + 3 ×</code> shows <code>5 ×</code>). The answer appears right in the
-                calculator display.
-            </p>
-            <p class="mb-0">
-                Notes: <code>%</code> gives the remainder (modulo), and dividing by zero is caught on
-                the server and reported as an error. You can also type on your keyboard: digits,
-                <code>+ - * / %</code>, <kbd>Enter</kbd> for equals, <kbd>Backspace</kbd> and
-                <kbd>Esc</kbd> to clear.
+                The controller evaluates the operation using a C# pattern matching <code>switch</code> expression,
+                handling special conditions like dividing by zero, and returns the computed result.
             </p>
 
-            <h5 class="mt-3">🧩 Code Snippet</h5>
+            <h5 class="fw-bold mt-4 mb-2 text-white">🧩 Code Snippet</h5>
             <div class="snippet-block">
 <code><span class="comment">// Controller (HomeController.cs)</span>
-<span class="comment">// needs: using System.Globalization;</span>
 [<span class="type">HttpPost</span>]
 <span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">BasicComputation</span>(<span class="keyword">double</span> num1, <span class="keyword">string</span> op, <span class="keyword">double</span> num2)
 {
@@ -210,65 +120,20 @@
         _                   =&gt; <span class="keyword">null</span>
     };
 
-    <span class="keyword">var</span> symbol = op <span class="keyword">switch</span> { <span class="string">"*"</span> =&gt; <span class="string">"×"</span>, <span class="string">"/"</span> =&gt; <span class="string">"÷"</span>, <span class="string">"-"</span> =&gt; <span class="string">"−"</span>, _ =&gt; op };
-    <span class="keyword">var</span> expression = <span class="string">$"{</span><span class="method">Format</span>(num1)<span class="string">} {symbol} {</span><span class="method">Format</span>(num2)<span class="string">}"</span>;
-
-    <span class="keyword">if</span> (result == <span class="keyword">null</span>)
-    {
-        <span class="keyword">var</span> error = (op == <span class="string">"/"</span> || op == <span class="string">"%"</span>) &amp;&amp; num2 == 0
-            ? <span class="string">"Cannot divide by zero."</span>
-            : <span class="string">"Unknown operator."</span>;
-        <span class="keyword">return</span> <span class="method">Json</span>(<span class="keyword">new</span> { expression, error });
-    }
-
-    <span class="keyword">return</span> <span class="method">Json</span>(<span class="keyword">new</span> { expression, answer = <span class="method">Format</span>(result.Value) });
-}
-
-<span class="comment">// Rounds away tiny floating-point noise (0.1 + 0.2)</span>
-<span class="keyword">private static string</span> <span class="method">Format</span>(<span class="keyword">double</span> value) =&gt;
-    <span class="type">Math</span>.<span class="method">Round</span>(value, 10).<span class="method">ToString</span>(<span class="type">CultureInfo</span>.InvariantCulture);</code>
-            </div>
-
-            <div class="snippet-block mt-2">
-<code><span class="comment">&lt;!-- View (BasicComputation.cshtml) --&gt;</span>
-&lt;<span class="keyword">form</span> <span class="type">method</span>=<span class="string">"post"</span> <span class="type">asp-action</span>=<span class="string">"BasicComputation"</span> <span class="type">id</span>=<span class="string">"calcForm"</span>&gt;
-    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"hidden"</span> <span class="type">name</span>=<span class="string">"num1"</span> <span class="type">id</span>=<span class="string">"num1"</span> /&gt;
-    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"hidden"</span> <span class="type">name</span>=<span class="string">"op"</span>   <span class="type">id</span>=<span class="string">"op"</span> /&gt;
-    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"hidden"</span> <span class="type">name</span>=<span class="string">"num2"</span> <span class="type">id</span>=<span class="string">"num2"</span> /&gt;
-&lt;/<span class="keyword">form</span>&gt;
-
-&lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"button"</span> <span class="type">data-key</span>=<span class="string">"7"</span>&gt;7&lt;/<span class="keyword">button</span>&gt;
-&lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"button"</span> <span class="type">data-key</span>=<span class="string">"+"</span>&gt;+&lt;/<span class="keyword">button</span>&gt;
-&lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"button"</span> <span class="type">data-key</span>=<span class="string">"="</span>&gt;=&lt;/<span class="keyword">button</span>&gt;
-
-&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"calc-display"</span>&gt;
-    &lt;<span class="keyword">div</span> <span class="type">id</span>=<span class="string">"calcExpression"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
-    &lt;<span class="keyword">div</span> <span class="type">id</span>=<span class="string">"calcValue"</span>&gt;0&lt;/<span class="keyword">div</span>&gt;   <span class="comment">&lt;!-- the answer shows here --&gt;</span>
-&lt;/<span class="keyword">div</span>&gt;</code>
-            </div>
-
-            <div class="snippet-block mt-2">
-<code><span class="comment">// JavaScript: send the calculation to the controller (no page reload)</span>
-<span class="keyword">async function</span> <span class="method">compute</span>() {
-    num1Field.value = left;
-    opField.value   = op;
-    num2Field.value = right;
-
-    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="method">fetch</span>(form.action, {
-        method: <span class="string">'POST'</span>,
-        body: <span class="keyword">new</span> <span class="type">FormData</span>(form)
-    });
-    <span class="keyword">return await</span> response.<span class="method">json</span>();   <span class="comment">// { expression, answer } or { expression, error }</span>
-}
-
-<span class="comment">// Pressing another operator after two numbers calculates first</span>
-<span class="keyword">async function</span> <span class="method">inputOperator</span>(o) {
-    <span class="keyword">if</span> (op &amp;&amp; right !== <span class="string">''</span>) {
-        <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="method">compute</span>();
-        <span class="keyword">if</span> (!<span class="method">applyResult</span>(result)) <span class="keyword">return</span>;
-    }
-    op = o;
+    <span class="comment">// Returns result to ViewBag or JSON</span>
+    <span class="type">ViewBag</span>.Answer = <span class="method">Format</span>(result.Value);
+    <span class="keyword">return</span> <span class="method">View</span>();
 }</code>
+            </div>
+
+            <div class="snippet-block mt-3">
+<code><span class="comment">&lt;!-- View (BasicComputation.cshtml) --&gt;</span>
+&lt;<span class="keyword">form</span> <span class="type">method</span>=<span class="string">"post"</span> <span class="type">asp-action</span>=<span class="string">"BasicComputation"</span>&gt;
+    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"number"</span> <span class="type">name</span>=<span class="string">"num1"</span> /&gt;
+    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"radio"</span>  <span class="type">name</span>=<span class="string">"op"</span> <span class="type">value</span>=<span class="string">"+"</span> /&gt;
+    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"number"</span> <span class="type">name</span>=<span class="string">"num2"</span> /&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span>&gt;Calculate&lt;/<span class="keyword">button</span>&gt;
+&lt;/<span class="keyword">form</span>&gt;</code>
             </div>
         </div>
     </div>
@@ -277,200 +142,37 @@
 @section Scripts {
     <script>
         (function () {
-            const calc       = document.getElementById('calc');
-            const form       = document.getElementById('calcForm');
-            const fNum1      = document.getElementById('num1');
-            const fOp        = document.getElementById('op');
-            const fNum2      = document.getElementById('num2');
-            const exprEl     = document.getElementById('calcExpression');
-            const valueEl    = document.getElementById('calcValue');
-            const errorBox   = document.getElementById('calcError');
-            const errorText  = document.getElementById('calcErrorText');
+            const card = document.getElementById('calcCard');
 
-            const symbols = { '+': '+', '-': '\u2212', '*': '\u00D7', '/': '\u00F7', '%': '%' };
+            // Calculate: post form without reloading the full page and swap in refreshed card
+            card.addEventListener('submit', async function (e) {
+                const form = e.target;
+                e.preventDefault();
 
-            let left = '';
-            let op = '';
-            let right = '';
-            let showingAnswer = false;
-            let lastExpression = '';
-            let error = '';
-            let busy = false;
-
-            function render() {
-                valueEl.classList.toggle('is-error', error !== '');
-                errorBox.classList.toggle('d-none', error === '');
-                errorText.textContent = error;
-
-                if (error) {
-                    exprEl.textContent = lastExpression;
-                    valueEl.textContent = 'Error';
-                    return;
-                }
-
-                if (showingAnswer && !op) {
-                    exprEl.textContent = lastExpression ? lastExpression + ' =' : '';
-                } else {
-                    exprEl.textContent = left + (op ? ' ' + symbols[op] : '') + (right ? ' ' + right : '');
-                }
-
-                valueEl.textContent = (op && right !== '') ? right : (left || '0');
-            }
-
-            // Sends left / op / right to the controller and returns its JSON reply
-            async function compute() {
-                const a = Number(left);
-                const b = Number(right);
-                if (Number.isNaN(a) || Number.isNaN(b)) return null;
-
-                fNum1.value = String(a);
-                fOp.value   = op;
-                fNum2.value = String(b);
-
-                busy = true;
                 try {
                     const response = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
 
-                    if (!response.ok) {
-                        return { expression: '', error: 'Server error ' + response.status + ' (' + response.statusText + '). Check the BasicComputation action.' };
-                    }
+                    const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+                    const fresh = doc.getElementById('calcCard');
+                    if (!fresh) throw new Error('Card not found in response');
 
-                    const type = response.headers.get('content-type') || '';
-                    if (!type.includes('application/json')) {
-                        return { expression: '', error: 'The action returned a page instead of JSON. BasicComputation must return Json(...), not View().' };
-                    }
-
-                    return await response.json();
-                } catch (e) {
-                    console.error(e);
-                    return { expression: '', error: 'Could not reach the server: ' + e.message };
-                } finally {
-                    busy = false;
+                    card.innerHTML = fresh.innerHTML;
+                } catch (err) {
+                    console.error(err);
+                    form.submit(); // fallback to regular post
                 }
-            }
-
-            // Shows the controller's reply. Returns true when the calculation succeeded.
-            function applyResult(result) {
-                if (!result) return false;
-
-                lastExpression = result.expression || '';
-                left = '';
-                op = '';
-                right = '';
-
-                if (result.error) {
-                    error = result.error;
-                    showingAnswer = false;
-                    return false;
-                }
-
-                left = result.answer;
-                showingAnswer = true;
-                return true;
-            }
-
-            function startFresh() {
-                if (showingAnswer && !op) {
-                    left = '';
-                    showingAnswer = false;
-                    lastExpression = '';
-                }
-            }
-
-            function appendDigit(current, d) {
-                if (current === '0') return d;
-                if (current === '-0') return '-' + d;
-                return current + d;
-            }
-
-            function inputDigit(d) {
-                startFresh();
-                if (op) right = appendDigit(right, d);
-                else left = appendDigit(left, d);
-            }
-
-            function inputDot() {
-                startFresh();
-                const target = op ? right : left;
-                if (target.includes('.')) return;
-                const next = (target === '' || target === '-') ? target + '0.' : target + '.';
-                if (op) right = next;
-                else left = next;
-            }
-
-            // Pressing an operator after two numbers calculates first, like a normal calculator
-            async function inputOperator(o) {
-                if (left === '' || left === '-') {
-                    if (o === '-' && left === '') left = '-';   // allow a leading minus sign
-                    return;
-                }
-
-                if (op && right !== '') {
-                    const result = await compute();
-                    if (!applyResult(result)) return;
-                }
-
-                op = o;
-                showingAnswer = false;
-            }
-
-            async function equals() {
-                if (left === '' || left === '-' || !op || right === '') return;
-                applyResult(await compute());
-            }
-
-            function backspace() {
-                if (showingAnswer && !op) { clearAll(); return; }
-                if (right !== '') right = right.slice(0, -1);
-                else if (op) op = '';
-                else left = left.slice(0, -1);
-            }
-
-            function clearAll() {
-                left = '';
-                op = '';
-                right = '';
-                showingAnswer = false;
-                lastExpression = '';
-            }
-
-            async function handleKey(key) {
-                if (busy) return;
-                error = '';
-
-                if (key >= '0' && key <= '9' && key.length === 1) inputDigit(key);
-                else if (key === '.') inputDot();
-                else if (symbols[key] !== undefined) await inputOperator(key);
-                else if (key === '=') await equals();
-                else if (key === 'B') backspace();
-                else if (key === 'C') clearAll();
-
-                render();
-            }
-
-            calc.addEventListener('click', function (e) {
-                const btn = e.target.closest('[data-key]');
-                if (btn) handleKey(btn.dataset.key);
             });
 
-            // Keyboard support
-            document.addEventListener('keydown', function (e) {
-                if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-                let key = null;
-                if ((e.key >= '0' && e.key <= '9' && e.key.length === 1) || e.key === '.') key = e.key;
-                else if (symbols[e.key] !== undefined) key = e.key;
-                else if (e.key === 'Enter' || e.key === '=') key = '=';
-                else if (e.key === 'Backspace') key = 'B';
-                else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') key = 'C';
-
-                if (key !== null) {
+            // Prevent scroll wheel and arrow keys from modifying number fields unintentionally
+            card.addEventListener('wheel', function (e) {
+                if (e.target.matches('input[type="number"]')) e.target.blur();
+            });
+            card.addEventListener('keydown', function (e) {
+                if (e.target.matches('input[type="number"]') && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
                     e.preventDefault();
-                    handleKey(key);
                 }
             });
-
-            render();
         })();
     </script>
 }

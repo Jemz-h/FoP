@@ -1,31 +1,954 @@
-html {
+/* ==========================================================================
+   YouTube Dark Mode Theme for FoP (Fundamentals of Programming)
+   ========================================================================== */
+
+:root {
+  --yt-bg-base: #0f0f0f;
+  --yt-bg-elevated: #212121;
+  --yt-bg-surface: #181818;
+  --yt-bg-card: #1e1e1e;
+  --yt-bg-chip: #272727;
+  --yt-bg-chip-hover: #3f3f3f;
+  --yt-bg-input: #121212;
+  --yt-bg-hover: rgba(255, 255, 255, 0.08);
+  --yt-bg-active: rgba(255, 255, 255, 0.15);
+
+  --yt-border: #303030;
+  --yt-border-light: rgba(255, 255, 255, 0.1);
+  --yt-border-hover: #525252;
+  --yt-border-focus: #3ea6ff;
+
+  --yt-text-primary: #f1f1f1;
+  --yt-text-secondary: #aaaaaa;
+  --yt-text-muted: #717171;
+
+  --yt-red: #ff0000;
+  --yt-red-hover: #cc0000;
+  --yt-blue: #3ea6ff;
+  --yt-blue-hover: #65b8ff;
+  --yt-green: #2ba640;
+  --yt-yellow: #f9ab00;
+
+  --yt-radius-sm: 8px;
+  --yt-radius-md: 12px;
+  --yt-radius-lg: 16px;
+  --yt-radius-pill: 9999px;
+
+  --yt-font: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --yt-font-mono: "Roboto Mono", Consolas, "Courier New", monospace;
+  --yt-header-height: 56px;
+  --yt-sidebar-width: 240px;
+}
+
+/* Base resets & Dark Mode foundations */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: var(--yt-bg-base) !important;
+  color: var(--yt-text-primary) !important;
+  font-family: var(--yt-font);
   font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+/* Custom YouTube Dark Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+::-webkit-scrollbar-track {
+  background: var(--yt-bg-base);
 }
 
-html {
+::-webkit-scrollbar-thumb {
+  background: #383838;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Layout Architecture */
+.yt-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--yt-bg-base);
+}
+
+/* ── Top Header Navigation Bar ── */
+.yt-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--yt-header-height);
+  background-color: var(--yt-bg-base);
+  border-bottom: 1px solid var(--yt-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 1030;
+}
+
+.yt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.yt-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--yt-text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  padding: 0;
+  text-decoration: none;
+}
+
+.yt-icon-btn:hover {
+  background-color: var(--yt-bg-hover);
+  color: var(--yt-text-primary);
+}
+
+.yt-icon-btn:active {
+  background-color: var(--yt-bg-active);
+}
+
+.yt-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: var(--yt-text-primary);
+  user-select: none;
+}
+
+.yt-logo-badge {
+  color: var(--yt-red);
+  display: flex;
+  align-items: center;
+}
+
+.yt-logo-text {
+  font-family: "Oswald", "Roboto Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+  color: #fff;
+  line-height: 1;
+}
+
+.yt-logo-sub {
+  font-size: 0.65rem;
+  color: var(--yt-text-secondary);
+  font-weight: 500;
+  margin-left: 3px;
+  text-transform: uppercase;
+  background: var(--yt-bg-chip);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+/* Center Search Bar */
+.yt-header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 720px;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.yt-search-container {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
   position: relative;
-  min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
+.yt-search-input {
+  width: 100%;
+  background-color: var(--yt-bg-input);
+  border: 1px solid var(--yt-border);
+  border-right: none;
+  border-radius: 40px 0 0 40px;
+  padding: 0 16px;
+  height: 40px;
+  color: var(--yt-text-primary);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.yt-search-input:focus {
+  border-color: var(--yt-border-focus);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.yt-search-input::placeholder {
+  color: var(--yt-text-secondary);
+}
+
+.yt-search-btn {
+  background-color: #222222;
+  border: 1px solid var(--yt-border);
+  border-radius: 0 40px 40px 0;
+  width: 64px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--yt-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.yt-search-btn:hover {
+  background-color: #2e2e2e;
+}
+
+.yt-mic-btn {
+  background-color: var(--yt-bg-elevated);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--yt-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.yt-mic-btn:hover {
+  background-color: #383838;
+}
+
+/* Header Right Actions */
+.yt-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yt-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #cc0000, #ff4e45);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+/* ── App Body: Sidebar + Main Area (Header Removed) ── */
+.yt-main-layout {
+  display: flex;
+  margin-top: 0;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ── Left Sidebar Navigation ── */
+.yt-sidebar {
+  width: var(--yt-sidebar-width);
+  background-color: var(--yt-bg-base);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding: 12px;
+  border-right: 1px solid var(--yt-border);
+  z-index: 1020;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s ease;
+}
+
+.yt-sidebar-brand {
+  padding: 8px 6px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.yt-sidebar.collapsed {
+  transform: translateX(-100%);
+}
+
+.yt-sidebar-section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--yt-text-secondary);
+  padding: 12px 14px 6px;
+  margin: 0;
+}
+
+.yt-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  border-radius: var(--yt-radius-md);
+  color: var(--yt-text-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.yt-nav-link svg {
+  flex-shrink: 0;
+  color: var(--yt-text-secondary);
+  transition: color 0.15s ease;
+}
+
+.yt-nav-link:hover {
+  background-color: var(--yt-bg-chip);
+  color: #fff;
+}
+
+.yt-nav-link:hover svg {
+  color: #fff;
+}
+
+.yt-nav-link.active {
+  background-color: var(--yt-bg-chip);
+  color: #fff;
+  font-weight: 600;
+}
+
+.yt-nav-link.active svg {
+  color: var(--yt-red);
+}
+
+.yt-sidebar-divider {
+  border: none;
+  height: 1px;
+  background-color: var(--yt-border);
+  margin: 10px 8px;
+}
+
+/* ── Content Viewport ── */
+.yt-content-wrapper {
+  flex: 1;
+  width: 100%;
+  margin-left: 0;
+  background-color: var(--yt-bg-base);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ── YouTube Chips / Filter Pill Bar ── */
+.yt-chips-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1010;
+  background-color: var(--yt-bg-base);
+  border-bottom: 1px solid var(--yt-border);
+  padding: 10px 24px;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.yt-chips-bar::-webkit-scrollbar {
+  height: 0; /* clean look */
+}
+
+.yt-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background-color: var(--yt-bg-chip);
+  color: var(--yt-text-primary);
+  border-radius: var(--yt-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.yt-chip:hover {
+  background-color: var(--yt-bg-chip-hover);
+  color: #fff;
+}
+
+.yt-chip.active {
+  background-color: #f1f1f1;
+  color: #0f0f0f;
+  font-weight: 600;
+}
+
+/* ── Main Page Stage / Video Watch-Page Aesthetics ── */
+.yt-container {
+  padding: 24px;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  flex: 1;
+}
+
+.yt-page-header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.yt-page-title-group h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: var(--yt-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.yt-page-desc {
+  color: var(--yt-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.yt-badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 0, 0, 0.15);
+  color: var(--yt-red);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--yt-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.yt-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--yt-red);
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.6; }
+}
+
+/* ── YouTube Cards / Panels (Video Player Stage + Description Box) ── */
+.yt-card {
+  background-color: var(--yt-bg-elevated);
+  border: 1px solid var(--yt-border);
+  border-radius: var(--yt-radius-lg);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  color: var(--yt-text-primary);
+  transition: border-color 0.2s ease;
+}
+
+.yt-card:hover {
+  border-color: #404040;
+}
+
+.yt-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--yt-border);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.yt-card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* YouTube Description & Meta Info Box */
+.yt-description-box {
+  background-color: var(--yt-bg-surface);
+  border: 1px solid var(--yt-border);
+  border-radius: var(--yt-radius-md);
+  padding: 20px;
+  color: var(--yt-text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.yt-meta-tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--yt-blue);
+  margin-bottom: 12px;
+}
+
+.yt-meta-stats {
+  font-size: 0.85rem;
+  color: var(--yt-text-secondary);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+/* ── Dark Form Controls & YouTube Inputs ── */
+.form-label {
+  color: var(--yt-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.form-control, .yt-input {
+  background-color: var(--yt-bg-input) !important;
+  border: 1px solid var(--yt-border) !important;
+  color: var(--yt-text-primary) !important;
+  border-radius: var(--yt-radius-sm) !important;
+  padding: 10px 14px !important;
+  font-size: 0.95rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.form-control:focus, .yt-input:focus {
+  border-color: var(--yt-border-focus) !important;
+  box-shadow: 0 0 0 1px var(--yt-border-focus) !important;
+  outline: none !important;
+  background-color: #161616 !important;
+}
+
+.form-control::placeholder, .yt-input::placeholder {
+  color: var(--yt-text-muted) !important;
+}
+
+/* Number input clean up */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── YouTube Action Buttons (Pill Aesthetic) ── */
+.btn-primary, .yt-btn-primary {
+  background-color: #fff !important;
+  color: #0f0f0f !important;
+  border: none !important;
+  border-radius: var(--yt-radius-pill) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 10px 20px !important;
+  transition: background-color 0.15s ease, transform 0.1s ease !important;
+  cursor: pointer;
+}
+
+.btn-primary:hover, .yt-btn-primary:hover {
+  background-color: #d9d9d9 !important;
+  color: #000 !important;
+}
+
+.btn-primary:active, .yt-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-danger, .yt-btn-danger {
+  background-color: var(--yt-red) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--yt-radius-pill) !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.btn-danger:hover, .yt-btn-danger:hover {
+  background-color: var(--yt-red-hover) !important;
+}
+
+.btn-outline-secondary, .yt-btn-secondary {
+  background-color: var(--yt-bg-chip) !important;
+  color: var(--yt-text-primary) !important;
+  border: 1px solid var(--yt-border) !important;
+  border-radius: var(--yt-radius-pill) !important;
+  font-weight: 500 !important;
+  padding: 10px 20px !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.btn-outline-secondary:hover, .yt-btn-secondary:hover {
+  background-color: var(--yt-bg-chip-hover) !important;
+  border-color: var(--yt-border-hover) !important;
+  color: #fff !important;
+}
+
+/* Input Groups */
+.input-group .form-control {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.input-group .btn {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+/* ── YouTube Alerts / Banner Notifications ── */
+.alert {
+  background-color: var(--yt-bg-surface) !important;
+  border: 1px solid var(--yt-border) !important;
+  border-left-width: 4px !important;
+  color: var(--yt-text-primary) !important;
+  border-radius: var(--yt-radius-md) !important;
+  padding: 14px 18px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+}
+
+.alert-success {
+  border-left-color: var(--yt-green) !important;
+}
+
+.alert-primary, .alert-info {
+  border-left-color: var(--yt-blue) !important;
+}
+
+.alert-warning {
+  border-left-color: var(--yt-yellow) !important;
+}
+
+.alert-danger {
+  border-left-color: var(--yt-red) !important;
+}
+
+.alert-secondary, .alert-dark {
+  border-left-color: #888888 !important;
+}
+
+/* ── YouTube Dark Code Syntax Blocks ── */
+.snippet-block {
+  background-color: #141414;
+  border: 1px solid var(--yt-border);
+  color: #d4d4d4;
+  border-radius: var(--yt-radius-md);
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  font-family: var(--yt-font-mono);
+  overflow-x: auto;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.snippet-block code {
+  font-family: inherit;
+  color: #d4d4d4;
+  white-space: pre;
+}
+
+.keyword  { color: #ff7b72; font-weight: 500; }
+.type     { color: #79c0ff; }
+.string   { color: #a5d6ff; }
+.comment  { color: #8b949e; font-style: italic; }
+/* ── Operator Pill Selector (Form-Based Calculator) ── */
+.yt-operator-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.yt-op-pill {
+  cursor: pointer;
+  margin: 0;
+}
+
+.yt-op-pill input {
+  display: none;
+}
+
+.yt-op-pill span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background-color: var(--yt-bg-chip);
+  border: 1px solid var(--yt-border);
+  border-radius: var(--yt-radius-pill);
+  color: var(--yt-text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.yt-op-pill span:hover {
+  background-color: var(--yt-bg-chip-hover);
+  border-color: #555;
+}
+
+.yt-op-pill input:checked + span {
+  background-color: #fff;
+  color: #0f0f0f;
+  font-weight: 700;
+  border-color: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* ── Calculator Component (YouTube Dark Spec) ── */
+.calc {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.calc-display {
+  background-color: #121212;
+  border: 1px solid var(--yt-border);
+  color: #fff;
+  border-radius: var(--yt-radius-md);
+  padding: 16px;
+  text-align: right;
+  font-family: var(--yt-font-mono);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.calc-expression {
+  min-height: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--yt-text-secondary);
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.calc-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow-x: auto;
+  color: #fff;
+}
+
+.calc-value.is-error {
+  color: var(--yt-red);
+}
+
+.calc-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.calc-btn {
+  padding: 14px 0 !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  border-radius: var(--yt-radius-md) !important;
+  transition: all 0.15s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid transparent !important;
+}
+
+.calc-num {
+  background-color: var(--yt-bg-chip) !important;
+  color: #fff !important;
+  border: 1px solid #333 !important;
+}
+
+.calc-num:hover {
+  background-color: var(--yt-bg-chip-hover) !important;
+}
+
+.calc-op {
+  background-color: rgba(62, 166, 255, 0.15) !important;
+  color: var(--yt-blue) !important;
+  border: 1px solid rgba(62, 166, 255, 0.3) !important;
+}
+
+.calc-op:hover {
+  background-color: rgba(62, 166, 255, 0.25) !important;
+  color: #fff !important;
+}
+
+.calc-equals {
+  background-color: var(--yt-blue) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+.calc-equals:hover {
+  background-color: var(--yt-blue-hover) !important;
+}
+
+.calc-clear {
+  background-color: rgba(255, 0, 0, 0.15) !important;
+  color: var(--yt-red) !important;
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+}
+
+.calc-clear:hover {
+  background-color: var(--yt-red) !important;
+  color: #fff !important;
+}
+
+.calc-backspace {
+  background-color: #303030 !important;
+  color: var(--yt-text-primary) !important;
+}
+
+.calc-backspace:hover {
+  background-color: #444 !important;
+}
+
+.calc-zero {
+  grid-column: span 2;
+}
+
+/* ── Array Component (YouTube Playlist Aesthetic) ── */
+.array-display {
+  background-color: var(--yt-bg-surface);
+  border: 1px solid var(--yt-border);
+  color: #fff;
+  border-radius: var(--yt-radius-md);
+  padding: 16px;
+  text-align: left;
+}
+
+.array-length {
+  font-size: 0.85rem;
+  color: var(--yt-text-secondary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.array-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.array-cell {
+  background-color: var(--yt-bg-chip);
+  border: 1px solid #444;
+  border-radius: var(--yt-radius-sm);
+  padding: 6px 12px;
+  text-align: center;
+  min-width: 5rem;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.array-cell:hover {
+  transform: translateY(-2px);
+  border-color: var(--yt-blue);
+}
+
+.array-cell .cell-index {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--yt-blue);
+  font-weight: 600;
+  font-family: var(--yt-font-mono);
+}
+
+.array-cell .cell-value {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.array-empty {
+  color: var(--yt-text-muted);
+  font-style: italic;
+}
+
+/* ── Footer ── */
+.yt-footer {
+  border-top: 1px solid var(--yt-border);
+  padding: 20px 24px;
+  background-color: var(--yt-bg-base);
+  color: var(--yt-text-muted);
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.yt-footer a {
+  color: var(--yt-text-secondary);
+  text-decoration: none;
+  margin-right: 14px;
+}
+
+.yt-footer a:hover {
+  color: #fff;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .yt-sidebar {
+    transform: translateX(-100%);
+  }
+  .yt-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.7);
+  }
+  .yt-content-wrapper {
+    margin-left: 0 !important;
+  }
+  .yt-header-center {
+    display: none;
+  }
 }

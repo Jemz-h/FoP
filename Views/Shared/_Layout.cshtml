@@ -4,70 +4,47 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Prog_Fun</title>
-    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Prog_Fun.styles.css" asp-append-version="true" />
-    <style>
-        /* Divider (|) between navbar options on wide screens */
-        .navbar-nav .nav-item {
-            display: flex;
-            align-items: center;
-        }
-
-        @@media (min-width: 576px) {
-            .navbar-nav .nav-item:not(:last-child)::after {
-                content: "|";
-                color: #adb5bd;
-            }
-        }
-    </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="GetInput">Get Input From User</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SumOfTwoNumbers">Sum of Two Numbers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="BasicComputation">Basic Computation</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="PopulatingFields">Populating Fields</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ConditionalStatement">Conditional Statement</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Array">Array</a>
-                        </li>
-                    </ul>
+<body class="yt-app">
+    @{
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "GetInput";
+    }
+
+    <div class="yt-main-layout">
+        <div class="yt-content-wrapper">
+            <!-- ── Top Filter Chips Navigation Bar ── -->
+            <nav class="yt-chips-bar" aria-label="Exercise navigation">
+                <a class="yt-chip @(currentAction == "GetInput" ? "active" : "")" asp-controller="Home" asp-action="GetInput">All</a>
+                <a class="yt-chip @(currentAction == "GetInput" ? "active" : "")" asp-controller="Home" asp-action="GetInput">Get Input</a>
+                <a class="yt-chip @(currentAction == "SumOfTwoNumbers" ? "active" : "")" asp-controller="Home" asp-action="SumOfTwoNumbers">Sum of Two</a>
+                <a class="yt-chip @(currentAction == "BasicComputation" ? "active" : "")" asp-controller="Home" asp-action="BasicComputation">Calculator</a>
+                <a class="yt-chip @(currentAction == "PopulatingFields" ? "active" : "")" asp-controller="Home" asp-action="PopulatingFields">Populate Fields</a>
+                <a class="yt-chip @(currentAction == "ConditionalStatement" ? "active" : "")" asp-controller="Home" asp-action="ConditionalStatement">Conditionals</a>
+                <a class="yt-chip @(currentAction == "Array" ? "active" : "")" asp-controller="Home" asp-action="Array">Arrays</a>
+            </nav>
+
+            <!-- ── Main Content Container ── -->
+            <main role="main" class="yt-container">
+                @RenderBody()
+            </main>
+
+            <footer class="yt-footer">
+                <div>
+                    <span>Prog_Fun &bull; Fundamentals of Programming</span>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+                <div>
+                    <span>&copy; 2026 Prog_Fun</span>
+                </div>
+            </footer>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Prog_Fun
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

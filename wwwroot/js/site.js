@@ -1,4 +1,12 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+// Prog_Fun Interactive Utilities
 
-// Write your JavaScript code.
+document.addEventListener('DOMContentLoaded', function () {
+    // Top Chips Navigation active state handling (if needed client-side)
+    const chips = document.querySelectorAll('.yt-chip');
+    chips.forEach(chip => {
+        chip.addEventListener('click', function () {
+            chips.forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+});
