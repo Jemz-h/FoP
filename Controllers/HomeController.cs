@@ -119,7 +119,7 @@ namespace Prog_Fun.Controllers
             return View();
         }
 
-        // ── Conditional Statement ──
+        // ── Conditional Statement (Student Grade Evaluator) ──
         [HttpGet]
         public IActionResult ConditionalStatement()
         {
@@ -127,33 +127,61 @@ namespace Prog_Fun.Controllers
         }
 
         [HttpPost]
-        public IActionResult ConditionalStatement(string name)
+        public IActionResult ConditionalStatement(double? score, double? presetScore = null)
         {
+            score = presetScore ?? score;
+
+            string branch;
+            string grade;
             string message;
             string color;   // Bootstrap color name used by the alert container
 
-            if (name == "Maria")
+            if (score == null || score < 0 || score > 100)
             {
-                message = "Welcome back, Maria! Everything is in order.";
+                branch  = "if (score == null || score < 0 || score > 100)";
+                grade   = "Invalid Score";
+                message = "Score must be a valid number between 0 and 100.";
+                color   = "danger";
+            }
+            else if (score >= 90)
+            {
+                branch  = "else if (score >= 90)";
+                grade   = "Grade A (Excellent)";
+                message = "Outstanding performance! High Honors standing.";
                 color   = "success";
             }
-            else if (name == "Juan")
+            else if (score >= 80)
             {
-                message = "Hello Juan! Here is some information for you.";
+                branch  = "else if (score >= 80)";
+                grade   = "Grade B (Very Good)";
+                message = "Very good mastery! Dean's List candidate.";
                 color   = "primary";
             }
-            else if (name == "Ana")
+            else if (score >= 75)
             {
-                message = "Hi Ana! Please review your details.";
+                branch  = "else if (score >= 75)";
+                grade   = "Grade C (Satisfactory)";
+                message = "Passed standard curriculum benchmarks.";
+                color   = "info";
+            }
+            else if (score >= 60)
+            {
+                branch  = "else if (score >= 60)";
+                grade   = "Grade D (Conditional / Remedial)";
+                message = "Marginal pass. Supplementary review recommended.";
                 color   = "warning";
             }
             else
             {
-                message = "Unknown name. Please pick one of the buttons.";
-                color   = "secondary";
+                branch  = "else";
+                grade   = "Grade F (Failing)";
+                message = "Did not meet passing criteria. Course retake required.";
+                color   = "danger";
             }
 
-            ViewBag.Name    = name;
+            ViewBag.Score   = score;
+            ViewBag.Branch  = branch;
+            ViewBag.Grade   = grade;
             ViewBag.Message = message;
             ViewBag.Color   = color;
             return View();
@@ -166,7 +194,7 @@ namespace Prog_Fun.Controllers
         [HttpGet]
         public IActionResult Array()
         {
-            ViewBag.Items = new string[] { "Apple", "Banana", "Cherry" };
+            ViewBag.Items = new string[] { "Chocolate", "Mocha", "Latte" };
             return View();
         }
 

@@ -5,7 +5,7 @@
 <div class="yt-page-header">
     <div class="yt-page-title-group">
         <h1>Conditional Statement</h1>
-        <p class="yt-page-desc">Learn how if / else if / else branching statements dictate logic flow in an ASP.NET Core MVC application.</p>
+        <p class="yt-page-desc">Learn how if / else if / else branching statements dictate logic flow and range evaluation in an ASP.NET Core MVC application.</p>
     </div>
 </div>
 
@@ -18,35 +18,68 @@
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="#FF0000">
                         <polygon points="6,3 18,12 6,21" />
                     </svg>
-                    Branching Logic
+                    Student Grade Classifier
                 </h5>
             </div>
 
-            <form method="post" asp-action="ConditionalStatement">
-                <p class="form-label text-start">Select a Profile / Condition:</p>
-                <div class="d-flex flex-column gap-2">
-                    <button type="submit" name="name" value="Maria" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center">
-                        <span>👩‍💼 Maria</span>
-                        <span class="badge" style="background-color: rgba(43, 166, 64, 0.2); color: var(--yt-green);">Status: Success</span>
-                    </button>
-                    <button type="submit" name="name" value="Juan" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center">
-                        <span>👨‍💻 Juan</span>
-                        <span class="badge" style="background-color: rgba(62, 166, 255, 0.2); color: var(--yt-blue);">Status: Info</span>
-                    </button>
-                    <button type="submit" name="name" value="Ana" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center">
-                        <span>👩‍🔬 Ana</span>
-                        <span class="badge" style="background-color: rgba(249, 171, 0, 0.2); color: var(--yt-yellow);">Status: Warning</span>
-                    </button>
+            <form method="post" asp-action="ConditionalStatement" id="gradeForm">
+                <div class="mb-3 text-start">
+                    <label for="scoreInput" class="form-label">Enter Exam Score (0 – 100):</label>
+                    <div class="input-group">
+                        <input type="number" id="scoreInput" name="score" class="form-control"
+                               placeholder="e.g., 88.5" step="any"
+                               value="@(ViewBag.Score != null ? ViewBag.Score.ToString() : "")" />
+                        <button type="submit" class="btn btn-primary px-3">
+                            <span class="me-1">▶</span> Evaluate
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-start mt-3">
+                    <p class="form-label mb-2">Or test a quick preset branch:</p>
+                    <div class="d-flex flex-column gap-2">
+                        <button type="submit" name="presetScore" value="95" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center preset-btn" data-score="95">
+                            <span>🌟 95% — High Honors</span>
+                            <span class="badge" style="background-color: rgba(43, 166, 64, 0.2); color: var(--yt-green);">score &gt;= 90 (Grade A)</span>
+                        </button>
+                        <button type="submit" name="presetScore" value="85" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center preset-btn" data-score="85">
+                            <span>📘 85% — Superior</span>
+                            <span class="badge" style="background-color: rgba(62, 166, 255, 0.2); color: var(--yt-blue);">score &gt;= 80 (Grade B)</span>
+                        </button>
+                        <button type="submit" name="presetScore" value="76" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center preset-btn" data-score="76">
+                            <span>📗 76% — Satisfactory</span>
+                            <span class="badge" style="background-color: rgba(0, 188, 212, 0.2); color: #00bcd4;">score &gt;= 75 (Grade C)</span>
+                        </button>
+                        <button type="submit" name="presetScore" value="65" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center preset-btn" data-score="65">
+                            <span>📙 65% — Conditional Pass</span>
+                            <span class="badge" style="background-color: rgba(249, 171, 0, 0.2); color: var(--yt-yellow);">score &gt;= 60 (Grade D)</span>
+                        </button>
+                        <button type="submit" name="presetScore" value="48" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center preset-btn" data-score="48">
+                            <span>📕 48% — Failing</span>
+                            <span class="badge" style="background-color: rgba(255, 75, 75, 0.2); color: #ff6b6b;">else (Grade F)</span>
+                        </button>
+                        <button type="submit" name="presetScore" value="105" class="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center preset-btn" data-score="105">
+                            <span>⚠️ 105% — Out of Range</span>
+                            <span class="badge" style="background-color: rgba(180, 180, 180, 0.2); color: #ccc;">Validation Error</span>
+                        </button>
+                    </div>
                 </div>
             </form>
 
             @if (ViewBag.Message != null)
             {
                 <div class="alert alert-@ViewBag.Color mt-4 mb-0 text-start">
-                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px;">
-                        Branch Executed: @ViewBag.Name
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; opacity: 0.9;">
+                        Branch Executed: <code>@ViewBag.Branch</code>
                     </div>
-                    <div class="fw-bold text-white">@ViewBag.Message</div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-white fs-5">@ViewBag.Grade</span>
+                        @if (ViewBag.Score != null)
+                        {
+                            <span class="badge bg-dark bg-opacity-75 border border-secondary text-white">Score: @ViewBag.Score</span>
+                        }
+                    </div>
+                    <div class="text-white small">@ViewBag.Message</div>
                 </div>
             }
         </div>
@@ -55,50 +88,78 @@
     @* ── Right Column: Description & Code Panel ── *@
     <div class="col-lg-7">
         <div class="yt-description-box">
-
-
             <h5 class="fw-bold mb-2 text-white">📖 How It Works</h5>
             <p>
-                A <em>conditional statement</em> empowers code to dynamically decide paths during runtime.
-                The controller inspects the button value submitted through the request and evaluates
-                <code>if</code>, <code>else if</code>, and <code>else</code> branches sequentially.
+                A <em>conditional statement</em> empowers code to dynamically decide execution paths during runtime.
+                In this grading system, the controller evaluates numerical ranges using an
+                <code>if</code>, <code>else if</code>, and <code>else</code> decision ladder.
             </p>
             <p>
-                The matching block assigns an alert theme color and personalized response string to
-                <code>ViewBag</code>.
+                Because branches evaluate sequentially from top to bottom, the first condition that evaluates to <code>true</code>
+                executes its block and skips the rest:
             </p>
+            <ul>
+                <li><strong>Validation (<code>if</code>):</strong> Catches invalid or missing values (e.g., negative scores or values &gt; 100) before any grading checks.</li>
+                <li><strong>Range Criteria (<code>else if</code>):</strong> Checks descending grade thresholds (<code>&gt;= 90</code>, <code>&gt;= 80</code>, <code>&gt;= 75</code>, <code>&gt;= 60</code>).</li>
+                <li><strong>Fallback (<code>else</code>):</strong> Catches any score below 60 as a failing grade.</li>
+            </ul>
 
             <h5 class="fw-bold mt-4 mb-2 text-white">🧩 Code Snippet</h5>
             <div class="snippet-block">
 <code><span class="comment">// Controller (HomeController.cs)</span>
 [<span class="type">HttpPost</span>]
-<span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">ConditionalStatement</span>(<span class="keyword">string</span> name)
+<span class="keyword">public</span> <span class="type">IActionResult</span> <span class="method">ConditionalStatement</span>(<span class="keyword">double</span>? score, <span class="keyword">double</span>? presetScore = <span class="keyword">null</span>)
 {
-    <span class="keyword">string</span> message;
-    <span class="keyword">string</span> color;
+    score = presetScore ?? score;
 
-    <span class="keyword">if</span> (name == <span class="string">"Maria"</span>)
+    <span class="keyword">string</span> branch, grade, message, color;
+
+    <span class="keyword">if</span> (score == <span class="keyword">null</span> || score &lt; <span class="number">0</span> || score &gt; <span class="number">100</span>)
     {
-        message = <span class="string">"Welcome back, Maria! Everything is in order."</span>;
+        branch  = <span class="string">"if (score == null || score &lt; 0 || score &gt; 100)"</span>;
+        grade   = <span class="string">"Invalid Score"</span>;
+        message = <span class="string">"Score must be a valid number between 0 and 100."</span>;
+        color   = <span class="string">"danger"</span>;
+    }
+    <span class="keyword">else if</span> (score &gt;= <span class="number">90</span>)
+    {
+        branch  = <span class="string">"else if (score &gt;= 90)"</span>;
+        grade   = <span class="string">"Grade A (Excellent)"</span>;
+        message = <span class="string">"Outstanding performance! High Honors standing."</span>;
         color   = <span class="string">"success"</span>;
     }
-    <span class="keyword">else if</span> (name == <span class="string">"Juan"</span>)
+    <span class="keyword">else if</span> (score &gt;= <span class="number">80</span>)
     {
-        message = <span class="string">"Hello Juan! Here is some information for you."</span>;
+        branch  = <span class="string">"else if (score &gt;= 80)"</span>;
+        grade   = <span class="string">"Grade B (Very Good)"</span>;
+        message = <span class="string">"Very good mastery! Dean's List candidate."</span>;
         color   = <span class="string">"primary"</span>;
     }
-    <span class="keyword">else if</span> (name == <span class="string">"Ana"</span>)
+    <span class="keyword">else if</span> (score &gt;= <span class="number">75</span>)
     {
-        message = <span class="string">"Hi Ana! Please review your details."</span>;
+        branch  = <span class="string">"else if (score &gt;= 75)"</span>;
+        grade   = <span class="string">"Grade C (Satisfactory)"</span>;
+        message = <span class="string">"Passed standard curriculum benchmarks."</span>;
+        color   = <span class="string">"info"</span>;
+    }
+    <span class="keyword">else if</span> (score &gt;= <span class="number">60</span>)
+    {
+        branch  = <span class="string">"else if (score &gt;= 60)"</span>;
+        grade   = <span class="string">"Grade D (Conditional / Remedial)"</span>;
+        message = <span class="string">"Marginal pass. Supplementary review recommended."</span>;
         color   = <span class="string">"warning"</span>;
     }
     <span class="keyword">else</span>
     {
-        message = <span class="string">"Unknown name. Please pick one of the buttons."</span>;
-        color   = <span class="string">"secondary"</span>;
+        branch  = <span class="string">"else"</span>;
+        grade   = <span class="string">"Grade F (Failing)"</span>;
+        message = <span class="string">"Did not meet passing criteria. Course retake required."</span>;
+        color   = <span class="string">"danger"</span>;
     }
 
-    <span class="type">ViewBag</span>.Name    = name;
+    <span class="type">ViewBag</span>.Score   = score;
+    <span class="type">ViewBag</span>.Branch  = branch;
+    <span class="type">ViewBag</span>.Grade   = grade;
     <span class="type">ViewBag</span>.Message = message;
     <span class="type">ViewBag</span>.Color   = color;
     <span class="keyword">return</span> <span class="method">View</span>();
@@ -108,9 +169,14 @@
             <div class="snippet-block mt-3">
 <code><span class="comment">&lt;!-- View (ConditionalStatement.cshtml) --&gt;</span>
 &lt;<span class="keyword">form</span> <span class="type">method</span>=<span class="string">"post"</span> <span class="type">asp-action</span>=<span class="string">"ConditionalStatement"</span>&gt;
-    &lt;<span class="keyword">button</span> <span class="type">submit</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Maria"</span>&gt;Maria&lt;/<span class="keyword">button</span>&gt;
-    &lt;<span class="keyword">button</span> <span class="type">submit</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Juan"</span>&gt;Juan&lt;/<span class="keyword">button</span>&gt;
-    &lt;<span class="keyword">button</span> <span class="type">submit</span> <span class="type">name</span>=<span class="string">"name"</span> <span class="type">value</span>=<span class="string">"Ana"</span>&gt;Ana&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">input</span> <span class="type">type</span>=<span class="string">"number"</span> <span class="type">name</span>=<span class="string">"score"</span> <span class="type">placeholder</span>=<span class="string">"e.g., 88.5"</span> /&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span>&gt;Evaluate&lt;/<span class="keyword">button</span>&gt;
+
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"presetScore"</span> <span class="type">value</span>=<span class="string">"95"</span>&gt;95% (Grade A)&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"presetScore"</span> <span class="type">value</span>=<span class="string">"85"</span>&gt;85% (Grade B)&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"presetScore"</span> <span class="type">value</span>=<span class="string">"76"</span>&gt;76% (Grade C)&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"presetScore"</span> <span class="type">value</span>=<span class="string">"65"</span>&gt;65% (Grade D)&lt;/<span class="keyword">button</span>&gt;
+    &lt;<span class="keyword">button</span> <span class="type">type</span>=<span class="string">"submit"</span> <span class="type">name</span>=<span class="string">"presetScore"</span> <span class="type">value</span>=<span class="string">"48"</span>&gt;48% (Grade F)&lt;/<span class="keyword">button</span>&gt;
 &lt;/<span class="keyword">form</span>&gt;</code>
             </div>
         </div>
@@ -122,10 +188,18 @@
         (function () {
             const card = document.getElementById('conditionalCard');
 
-            // Click a name: post form in background and swap refreshed card
+            // Wire up submit handling with AJAX background fetch
             card.addEventListener('submit', async function (e) {
                 const form = e.target;
                 e.preventDefault();
+
+                // If a preset button was clicked, reflect its score into the input field
+                if (e.submitter && e.submitter.classList.contains('preset-btn')) {
+                    const scoreInput = form.querySelector('#scoreInput');
+                    if (scoreInput) {
+                        scoreInput.value = e.submitter.dataset.score;
+                    }
+                }
 
                 const data = new FormData(form, e.submitter);
 
